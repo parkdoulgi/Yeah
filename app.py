@@ -1,38 +1,66 @@
-const elements = {
-    "H": { name: "수소", val: 1, en: 2.2 }, "He": { name: "헬륨", val: 0, en: 0 },
-    "Li": { name: "리튬", val: 1, en: 0.98 }, "Be": { name: "베릴륨", val: 2, en: 1.57 },
-    "B": { name: "붕소", val: 3, en: 2.04 }, "C": { name: "탄소", val: 4, en: 2.55 },
-    "N": { name: "질소", val: 5, en: 3.04 }, "O": { name: "산소", val: 6, en: 3.44 },
-    "F": { name: "플루오린", val: 7, en: 3.98 }, "Ne": { name: "네온", val: 0, en: 0 },
-    "Na": { name: "나트륨", val: 1, en: 0.93 }, "Mg": { name: "마그네슘", val: 2, en: 1.31 },
-    "Al": { name: "알루미늄", val: 3, en: 1.61 }, "Si": { name: "규소", val: 4, en: 1.90 },
-    "P": { name: "인", val: 5, en: 2.19 }, "S": { name: "황", val: 6, en: 2.58 },
-    "Cl": { name: "염소", val: 7, en: 3.16 }, "Ar": { name: "아르곤", val: 0, en: 0 },
-    "K": { name: "칼륨", val: 1, en: 0.82 }, "Ca": { name: "칼슘", val: 2, en: 1.00 }
-};
-<style>
-    .periodic-table {
-        display: grid;
-        grid-template-columns: repeat(8, 50px); /* 주기율표 형태 */
-        gap: 5px;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>원소 결합 프로그램</title>
+    <style>
+        /* CSS는 반드시 여기 style 태그 안에 있어야 합니다 */
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            gap: 5px;
+            margin: 20px;
+        }
+        .element {
+            width: 50px; height: 50px; border: 1px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; background: #f0f0f0;
+        }
+        .element:hover { background: #ddd; }
+        .selected { background: #ffcc00 !important; }
+    </style>
+</head>
+<body>
 
-<div class="periodic-table" id="table">
-    </div>
-    function getBondResult(e1, e2) {
-    const el1 = elements[e1];
-    const el2 = elements[e2];
-    
-    // 1. 비활성 기체 예외 처리
-    if (el1.val === 0 || el2.val === 0) return "비활성 기체는 결합하지 않습니다.";
+    <h1>원소 결합 시뮬레이터 (1~20번)</h1>
+    <div class="periodic-table" id="table"></div>
+    <div id="result">원소 2개를 선택하세요.</div>
 
-    // 2. 전기 음성도 차이로 결합 분류
-    const diff = Math.abs(el1.en - el2.en);
-    let bondType = diff > 1.7 ? "이온 결합" : "공유 결합";
+    <script>
+        const elements = {
+            "H": { name: "수소", en: 2.2 }, "He": { name: "헬륨", en: 0 },
+            "Li": { name: "리튬", en: 0.98 }, "Be": { name: "베릴륨", en: 1.57 },
+            "B": { name: "붕소", en: 2.04 }, "C": { name: "탄소", en: 2.55 },
+            "N": { name: "질소", en: 3.04 }, "O": { name: "산소", en: 3.44 },
+            "F": { name: "플루오린", en: 3.98 }, "Ne": { name: "네온", en: 0 },
+            "Na": { name: "나트륨", en: 0.93 }, "Mg": { name: "마그네슘", en: 1.31 },
+            "Al": { name: "알루미늄", en: 1.61 }, "Si": { name: "규소", en: 1.90 },
+            "P": { name: "인", en: 2.19 }, "S": { name: "황", en: 2.58 },
+            "Cl": { name: "염소", en: 3.16 }, "Ar": { name: "아르곤", en: 0 },
+            "K": { name: "칼륨", en: 0.82 }, "Ca": { name: "칼슘", en: 1.00 }
+        };
 
-    // 3. 단순 화학식 생성 (전하 균형 예시)
-    // 예: Na(1+) + Cl(1-) -> NaCl
-    // 이 부분은 산화수 계산 로직을 고도화하면 완벽해집니다.
-    return `${e1}-${e2} 결합: ${bondType}`;
-}
+        const table = document.getElementById('table');
+        let selected = [];
+
+        Object.keys(elements).forEach(symbol => {
+            const div = document.createElement('div');
+            div.className = 'element';
+            div.innerText = symbol;
+            div.onclick = () => {
+                if (selected.length < 2 && !selected.includes(symbol)) {
+                    selected.push(symbol);
+                    div.classList.add('selected');
+                }
+                if (selected.length === 2) {
+                    const [e1, e2] = selected;
+                    const diff = Math.abs(elements[e1].en - elements[e2].en);
+                    const type = diff > 1.7 ? "이온 결합" : "공유 결합";
+                    document.getElementById('result').innerText = `${e1}와 ${e2}는 ${type}을 형성합니다.`;
+                }
+            };
+            table.appendChild(div);
+        });
+    </script>
+</body>
+</html>
